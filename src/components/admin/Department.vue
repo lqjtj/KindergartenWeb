@@ -148,5 +148,6 @@ let id = 1000;
 <style scoped>
 .test{
    width:100px;
+   display: none;
 }
 </style>
