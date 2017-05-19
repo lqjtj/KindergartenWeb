@@ -4,15 +4,15 @@
  <div style="margin-top: 15px;width:60%;">
   <el-input placeholder="请输入内容" v-model="svalue">
     <el-select v-model="sname" slot="prepend" placeholder="请选择">
-      <el-option label="姓名" value="userid"></el-option>
-      <el-option label="地址" value="c_code"></el-option>
-      <el-option label="用户电话" value="3"></el-option>
+      <el-option label="姓名" value="name"></el-option>
+      <el-option label="电话" value="client"></el-option>
+      <el-option label="备注" value="note"></el-option>
     </el-select>
     <el-button slot="append" icon="search" @click="onPost"></el-button>
   </el-input>
 </div>
 
-     <el-button type="primary" @click="onPost" :loading="bloading">post method</el-button>
+     <el-button type="primary" @click="onPost" :loading="bloading">搜索</el-button>
 
 <el-table
       @row-dblclick="onDbclick"
@@ -24,29 +24,44 @@
       style="width: 100%">
       <el-table-column
         prop="hkey"
-        class-name="ckey"
-        label-class-name="ckey"
-        label="">
+        class-name="hkey"
+        label-class-name="hkey"
+        label=""
+        width="30">
       </el-table-column>     
       <el-table-column
         sortable
-        prop="date"
-        label="日期"
+        prop="client"
+        label="client"
         width="180">
       </el-table-column>
       <el-table-column
         prop="name"
-        label="姓名"
+        label="name"
         width="180">
       </el-table-column>
       <el-table-column
-        prop="address"
-        label="地址">
+        prop="inserttime"
+        label="inserttime"
+        width="180">
       </el-table-column>
       <el-table-column
-        prop="amount"
-        label="数量">
-      </el-table-column>      
+        prop="tag"
+        label="tag">
+      </el-table-column>
+      <el-table-column
+        prop="note"
+        label="note">
+      </el-table-column>  
+      <!--<el-table-column inline-template
+                                         label="操作"
+                                         width="250">
+                            <span>
+                                <el-button type="primary" size="mini" @click="removeUser(row)">删除</el-button>
+                                <el-button type="primary" size="mini" @click="setCurrent(row)">编辑</el-button>
+                            </span>
+                        </el-table-column>-->
+    
     </el-table>
  <div class="block">
     <el-pagination
@@ -60,7 +75,7 @@
     </el-pagination>
   </div>
 
-     <el-button type="primary" @click="onNew">新建</el-button>
+     <!--<el-button type="primary" @click="onNew">新建</el-button>-->
 
      <el-button type="primary" @click="dialogCreateVisible = true">添加用户</el-button>
 
@@ -84,7 +99,9 @@
         </div>
       </el-dialog>-->
 
-     <el-button type="primary" @click="onUpdate">修改</el-button>
+     <!--<el-button type="primary" @click="onUpdate">修改</el-button>-->
+     <!--<el-button type="primary" @click="dialogUpdateVisible = true">修改</el-button>-->
+     <el-button type="primary" @click="setCurrent()">修改</el-button>
       <el-button type="primary" @click="onDelete">删除</el-button>
 <el-upload
   class="avatar-uploader"
@@ -96,30 +113,57 @@
   <i v-else class="el-icon-plus avatar-uploader-icon"></i>
 </el-upload>
 
-  <el-dialog title="创建用户" v-model="dialogCreateVisible" :close-on-click-modal="false" :close-on-press-escape="false" @close="reset" >
+  <el-dialog title="创建用户" v-model="dialogCreateVisible" :close-on-click-modal="false" :close-on-press-escape="false"  >
         <el-form id="#create" :model="create" :rules="rules" ref="create" label-width="100px">
-            <el-form-item label="用户名" prop="username">
-                <el-input v-model="create.username"></el-input>
-            </el-form-item>
             <el-form-item label="姓名" prop="name">
                 <el-input v-model="create.name"></el-input>
             </el-form-item>
-            <el-form-item label="密码" prop="password">
+            <el-form-item label="手机号码" prop="client">
+                <el-input v-model="create.client"></el-input>
+            </el-form-item>
+            <!--<el-form-item label="密码" prop="password">
                 <el-input v-model="create.password" type="password" auto-complete="off"></el-input>
             </el-form-item>
             <el-form-item label="确认密码" prop="checkpass">
                 <el-input v-model="create.checkpass" type="password"></el-input>
+            </el-form-item>-->
+            <el-form-item label="优先级" prop="tag">
+                <el-input v-model="create.tag"></el-input>
             </el-form-item>
-            <el-form-item label="电话" prop="phone">
-                <el-input v-model="create.phone"></el-input>
-            </el-form-item>
-            <el-form-item label="邮箱" prop="email">
-                <el-input v-model="create.email"></el-input>
+            <el-form-item label="备注" prop="note">
+                <el-input v-model="create.note"></el-input>
             </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
             <el-button @click="dialogCreateVisible = false">取 消</el-button>
             <el-button type="primary" :loading="createLoading" @click="createUser">确 定</el-button>
+        </div>
+    </el-dialog>
+
+     <el-dialog title="修改用户" v-model="dialogUpdateVisible" :close-on-click-modal="false" :close-on-press-escape="false"  >
+        <el-form id="#update" :model="update" :rules="rules" ref="update" label-width="100px">
+            <el-form-item label="姓名" prop="name">
+                <el-input v-model="update.name"></el-input>
+            </el-form-item>
+            <el-form-item label="手机号码" prop="client">
+                <el-input v-model="update.client"></el-input>
+            </el-form-item>
+            <!--<el-form-item label="密码" prop="password">
+                <el-input v-model="create.password" type="password" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="确认密码" prop="checkpass">
+                <el-input v-model="create.checkpass" type="password"></el-input>
+            </el-form-item>-->
+            <el-form-item label="优先级" prop="tag">
+                <el-input v-model="update.tag"></el-input>
+            </el-form-item>
+            <el-form-item label="备注" prop="note">
+                <el-input v-model="update.note"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogUpdateVisible = false">取 消</el-button>
+            <el-button type="primary" :loading="updateLoading" @click="updateUser">确 定</el-button>
         </div>
     </el-dialog>
 
@@ -161,57 +205,62 @@ function getuuid(){
           users: [
           ],
           create: {
-              id: '',
-              username: '',
+            //  id: '',
               name: '',
+              tag: '',
               password: '',
-              checkpass: '',
-              phone: '',
-              email: '',
+            //  checkpass: '',
+              client: '',
+              note: '',
               is_active: true
           },
           currentId:'',
           update:{
               name: '',
-              phone: '',
-              email: '',
+              client: '',
+              tag: '',
+              note: '',
               is_active: true
           },
           rules: {
               name: [
-                  { required: true, message: '请输入姓名', trigger: 'blur' },
-                  { min: 3, max: 15, message: '长度在 3 到 15 个字符'}
+                  { required: true, message: '请输入用户姓名', trigger: 'blur' },
+                  { min: 2, max: 15, message: '长度在 2 到 15 个字符'}
               ],
-              username: [
-                  { required: true, message: '请输入用户名', trigger: 'blur' },
-                  { min: 3, max: 25, message: '长度在 3 到 25 个字符'},
-                  { pattern:/^[A-Za-z0-9]+$/, message: '用户名只能为字母和数字'}
+              client:[
+                  { required: true, pattern:/^1[34578]\d{9}$/, message: '请输入中国国内的手机号码'}
               ],
-              password: [
-                  { required: true, message: '请输入密码', trigger: 'blur' },
-                  { min: 6, max: 25, message: '长度在 6 到 25 个字符'}
+              tag: [
+                  { required: true, message: '请输入用户优先级', trigger: 'blur' },
+                  { min: 2, max: 15, message: '长度在 2 到 15 个字符'}
               ],
-              checkpass: [
-                  { required: true, message: '请再次输入密码', trigger: 'blur' },
-                  { validator: validatePass}
-              ],
-              email: [
-                  { type: 'email', message: '邮箱格式不正确'}
-              ],
-              phone:[
-                  { pattern:/^1[34578]\d{9}$/, message: '请输入中国国内的手机号码'}
+              note: [
+                  {  message: '请输入备注信息'},
+                  { min: 2, max: 15, message: '长度在 2 到 15 个字符'}
               ]
+              // ,
+              // email: [
+              //     { type: 'email', message: '邮箱格式不正确'}
+              // ],
+              // phone:[
+              //     { pattern:/^1[34578]\d{9}$/, message: '请输入中国国内的手机号码'}
+              // ]
           },
           updateRules: {
               name: [
-                  { required: true, message: '请输入姓名', trigger: 'blur' },
-                  { min: 3, max: 15, message: '长度在 3 到 15 个字符'}
+                  { required: true, message: '请输入用户姓名', trigger: 'blur' },
+                  { min: 2, max: 15, message: '长度在 2 到 15 个字符'}
               ],
-              email: [
-                  { type: 'email', message: '邮箱格式不正确'}
+              client:[
+                  { required: true, pattern:/^1[34578]\d{9}$/, message: '请输入中国国内的手机号码'}
               ],
-              phone:[
-                  { pattern:/^1[34578]\d{9}$/, message: '请输入中国国内的手机号码'}
+              tag: [
+                  { required: true, message: '请输入用户优先级', trigger: 'blur' },
+                  { min: 2, max: 15, message: '长度在 2 到 15 个字符'}
+              ],
+              note: [
+                  {  message: '请输入备注信息'},
+                  { min: 2, max: 15, message: '长度在 2 到 15 个字符'}
               ]
           },
           filter: {
@@ -270,11 +319,58 @@ function getuuid(){
       } ,   
     methods: {
 
+      //修改用户进行操作
+      updateUser(){
+       // alert(this.update.name+this.update.client+this.update.tag+this.update.note);
+
+          let _this=this
+          var params_json={clientId:this.update.hkey,name:this.update.name,client:this.update.client,tag:this.update.tag,note:this.update.note};
+          
+        // alert(JSON.stringify(params_json));
+         //  var params_json={userId:'15122922900',action:'getdepartment',param1:'ceshi',param2:'13700000000',param3:'1111',param4:'note',param5:''};
+           this.$http.post('/KindergartenWeb/action/user/update.do',params_json,{withCredentials:true}).then(function (res) {
+          // alert(JSON.stringify(res.data.rows));
+          // alert(JSON.stringify(res.data));
+          // _this.data2=res.data.rows;
+         // alert("成功修改");
+          _this.$message({
+            showClose: true,
+            message: '修改用户资料信息成功！',
+            type: 'success'
+        });
+          //  this.$message.success('修改用户资料信息成功！');
+           _this.dialogUpdateVisible=false;
+           _this.updateLoading=false;   
+           _this.onPost();       
+        }).catch(function (error) {
+            _this.$message.error(error);
+        })     
+      },
+
 //测试用，新建用户进行操作
         createUser(){
-          alert(this.create.name+this.create.email+this.create.password);
-          alert(valid);
+          //alert(this.create.name+this.create.client+this.create.tag+this.create.note);
+
+          let _this=this
+          var params_json={name:this.create.name,client:this.create.client,tag:this.create.tag,note:this.create.note};
           
+        // alert(JSON.stringify(params_json));
+         //  var params_json={userId:'15122922900',action:'getdepartment',param1:'ceshi',param2:'13700000000',param3:'1111',param4:'note',param5:''};
+           this.$http.post('/KindergartenWeb/action/user/add.do',params_json,{withCredentials:true}).then(function (res) {
+          // alert(JSON.stringify(res.data.rows));
+          // alert(JSON.stringify(res.data));
+           _this.data2=res.data.rows;
+           _this.$message({
+            showClose: true,
+            message: '新建用户成功！',
+            type: 'success'
+        });
+        _this.dialogCreateVisible=false;
+           _this.createLoading=false;   
+           _this.onPost();
+        }).catch(function (error) {
+            _this.$message.error(error);
+        })     
           // 主动校验
           // this.$refs.create.validate((valid) => {
           //     if (valid) {
@@ -310,6 +406,7 @@ function getuuid(){
 
        handleCurrentRowChange(val) {
         this.currentRow = val;
+        //alert(val.hkey);
       },
      onDbclick(row, event){
              alert(row.hkey);
@@ -345,6 +442,13 @@ function getuuid(){
         var data = []
         let url = 'table.json'
           let _this = this
+        //  var wherex="1=1";
+
+        //  alert(this.svalue+this.sname);
+          // if(where=="select"){
+          //   wherwx=" "+this.svalue+" like '%"+this.sname+"%'"
+          // }
+
        var params = new URLSearchParams();
             params.append('userId', '15122922900');
             params.append('action', 'query_rk_pc');
@@ -356,18 +460,21 @@ function getuuid(){
             
             var scondition='';
             if(_this.svalue!=''&&_this.sname!=''){
-               scondition= _this.sname+" like '"+_this.svalue+"%'";
+               scondition= _this.sname+" like '%"+_this.svalue+"%'";
             }
+         //   alert(scondition);
        var params_json={userId:'15122922900',action:'user_list',param1:scondition,param2:this.pageSize.toString(),param3:this.currentPage.toString(),param4:'',param5:''};
 
-         this.$http.post('/api/action/query.do',params_json,{withCredentials:false}).then(function (res) {
+         this.$http.post('/KindergartenWeb/action/query.do',params_json,{withCredentials:false}).then(function (res) {
+          //  alert(JSON.stringify(res))
             for (let i = 0; i < res.data.rows.length; i++) {
                 var obj = {}
-                obj.date = res.data.rows[i].date
+                obj.note = res.data.rows[i].note
+                obj.inserttime = res.data.rows[i].inserttime
                 obj.name = res.data.rows[i].name
-                obj.address = res.data.rows[i].c_code
-                obj.amount=res.data.rows[i].amount
-                obj.hkey=res.data.rows[i].name
+                obj.client = res.data.rows[i].client
+                obj.tag=res.data.rows[i].tag
+                obj.hkey=res.data.rows[i].hkey
                 data[i] = obj
             }
             _this.total=parseInt(res.data.total.split('#')[0])
@@ -396,29 +503,71 @@ function getuuid(){
             
            //alert("新建");
       }, 
-      open3() {
-        this.$prompt('请输入邮箱', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
-          inputErrorMessage: '邮箱格式不正确'
-        }).then(({ value }) => {
-          this.$message({
-            type: 'success',
-            message: '你的邮箱是: ' + value
-          });
-        }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '取消输入'
-          });       
-        });
+      // open3() {
+      //   this.$prompt('请输入邮箱', '提示', {
+      //     confirmButtonText: '确定',
+      //     cancelButtonText: '取消',
+      //     inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
+      //     inputErrorMessage: '邮箱格式不正确'
+      //   }).then(({ value }) => {
+      //     this.$message({
+      //       type: 'success',
+      //       message: '你的邮箱是: ' + value
+      //     });
+      //   }).catch(() => {
+      //     this.$message({
+      //       type: 'info',
+      //       message: '取消输入'
+      //     });       
+      //   });
+      // },
+
+      setCurrent(){
+          this.update.hkey=this.currentRow.hkey;
+          this.update.name=this.currentRow.name;
+          this.update.client=this.currentRow.client;
+          this.update.tag=this.currentRow.tag;
+          this.update.note=this.currentRow.note;
+          this.update.is_active=this.currentRow.is_active;
+          this.dialogUpdateVisible=true;
       },
+
+
        onUpdate() {
            alert(this.currentRow.hkey);
+        //     let _this=this
+        //   var params_json={name:this.create.name,client:this.create.client,tag:this.create.tag,note:this.create.note};
+          
+        //  alert(JSON.stringify(params_json));
+        //  //  var params_json={userId:'15122922900',action:'getdepartment',param1:'ceshi',param2:'13700000000',param3:'1111',param4:'note',param5:''};
+        //    this.$http.post('/KindergartenWeb/action/user/add.do',params_json,{withCredentials:true}).then(function (res) {
+        //    alert(JSON.stringify(res.data.rows));
+        //    alert(JSON.stringify(res.data));
+        //    _this.data2=res.data.rows;
+        // }).catch(function (error) {
+
+        // })     
       },  
+      
        onDelete() {
-          alert("删除");
+          let _this=this
+          var params_json={key:this.currentRow.hkey};
+          
+        // alert(JSON.stringify(params_json));
+         //  var params_json={userId:'15122922900',action:'getdepartment',param1:'ceshi',param2:'13700000000',param3:'1111',param4:'note',param5:''};
+           this.$http.post('/KindergartenWeb/action/user/delete.do',params_json,{withCredentials:true}).then(function (res) {
+          // alert(JSON.stringify(res.data.rows));
+          // alert(JSON.stringify(res.data));
+           _this.data2=res.data.rows;
+           _this.$message({
+            showClose: true,
+            message: '删除用户成功！',
+            type: 'success'
+        });  
+           _this.onPost('1=1');
+        }).catch(function (error) {
+            _this.$message.error(error);
+        })     
       },                      
     },
  created: function () {
