@@ -548,6 +548,7 @@ function getuuid(){
 
         // })     
       },  
+
       
        onDelete() {
           let _this=this
