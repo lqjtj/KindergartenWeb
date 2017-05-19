@@ -146,5 +146,7 @@ let id = 1000;
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+.test{
+   width:100px;
+}
 </style>
