@@ -549,7 +549,6 @@ function getuuid(){
         // })     
       },  
 
-      
        onDelete() {
           let _this=this
           var params_json={key:this.currentRow.hkey};
