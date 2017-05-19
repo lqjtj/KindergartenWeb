@@ -69,7 +69,7 @@ let id = 1000;
            //alert(JSON.stringify(res.data.rows));
            _this.data2=res.data.rows;
         }).catch(function (error) {
-              
+              alert(error);
         })     
     },
      onFormSave(){
