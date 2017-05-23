@@ -11,6 +11,7 @@ import 'element-ui/lib/theme-default/index.css'
 import Hello from './components/business/Hello'
 import Login from './components/business/Login'
 import Test from './components/business/Test'
+import Test2 from './components/business/Test2'
 import Table from './components/business/Table'
 import Main from './components/sys/Main'
 import User from './components/admin/User'
@@ -39,6 +40,7 @@ const routes = [
       { path: '/hello', name: 'Hello', component: Hello } ,
       { path: '/table', name: 'table', component: Table } ,
        { path: '/test', name: 'test', component: Test } ,
+       { path: '/test2', name: 'test2', component: Test2 } ,
         { path: '/user', name: 'user', component: User },
          { path: '/department', name: 'department', component: Department }  
     ],
