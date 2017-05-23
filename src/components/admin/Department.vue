@@ -32,10 +32,11 @@
 
 <script>
 let id = 1000;
-
+const cityOptions = ['上海', '北京', '广州', '深圳'];
   export default {
     data() {
       return {
+        cities: cityOptions,
         formLabelWidth:80,
         optype:'',
         form:{
@@ -129,16 +130,17 @@ let id = 1000;
 
       renderContent(h, { node, data, store }) {
         return (<span>
-            <span>
-              <span>{node.label}</span>
-            </span>
-            <span style="float: right; margin-right: 20px">
-              <el-button size="mini" on-click={ () => this.insert(store, data) }>插入新节点</el-button>
-              <el-button size="mini" on-click={ () => this.update(store, data) }>修改节点信息</el-button>
-              <el-button size="mini" on-click={ () => this.append(store, data) }>增加子节点</el-button>
-              <el-button size="mini" on-click={ () => this.remove(store, data) }>删除节点</el-button>
-            </span>
-          </span>);
+                    <span>
+                      <span>{node.label}</span>
+                    </span>
+                    <span style="float: right; margin-right: 20px">
+                        <el-button size="mini" on-click={ () => this.insert(store, data) }>插入新节点</el-button>
+                        <el-button size="mini" on-click={ () => this.update(store, data) }>修改节点信息</el-button>
+                        <el-button size="mini" on-click={ () => this.append(store, data) }>增加子节点</el-button>
+                        <el-button size="mini" on-click={ () => this.remove(store, data) }>删除节点</el-button>
+                    </span>
+           </span>
+          );
       }
     }
   };

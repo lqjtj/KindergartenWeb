@@ -16,6 +16,9 @@ import Table from './components/business/Table'
 import Main from './components/sys/Main'
 import User from './components/admin/User'
 import Department from './components/admin/Department'
+import Role from './components/admin/Role'
+import RoleUser from './components/admin/RoleUser'
+import RolePrivilege from './components/admin/RolePrivilege'
 
 axios.defaults.withCredentials=true;
 Vue.prototype.$http = axios
@@ -42,7 +45,10 @@ const routes = [
        { path: '/test', name: 'test', component: Test } ,
        { path: '/test2', name: 'test2', component: Test2 } ,
         { path: '/user', name: 'user', component: User },
-         { path: '/department', name: 'department', component: Department }  
+         { path: '/department', name: 'department', component: Department } ,
+           { path: '/role', name: 'role', component: Role } ,
+             { path: '/roleUser', name: 'roleUser', component: RoleUser } ,
+               { path: '/rolePrivilege', name: 'rolePrivilege', component: RolePrivilege }  
     ],
   },
 ]

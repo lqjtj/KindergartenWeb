@@ -38,7 +38,8 @@ module.exports = {
       // proxy all requests starting with /api to jsonplaceholder
       '/KindergartenWeb': {
         //target: 'http://221.239.8.180:8888/KindergartenWeb/',
-        target: 'http://192.168.2.93:8080/',
+        //target: 'http://192.168.2.93:8080/',
+        target: 'http://localhost:8080/',
         changeOrigin: true
 
       }
