@@ -4,10 +4,9 @@
       :data="data2"
       :props="defaultProps"
       highlight-current
-      show-checkbox
       node-key="id"
       default-expand-all
-      @node-click="onClick"
+    
       :expand-on-click-node="false"
       :render-content="renderContent">
     </el-tree>
@@ -18,8 +17,11 @@
       <el-input v-model="form.id" auto-complete="off"></el-input>
     </el-form-item>
     <el-form-item label="节点名称" :label-width="formLabelWidth">
-       <el-input v-model="form.label" auto-complete="off"></el-input>
+       <el-input v-model="form.title" auto-complete="off"></el-input>
     </el-form-item>
+    <el-form-item label="序号" :label-width="formLabelWidth">
+       <el-input v-model="form.tag" auto-complete="off"></el-input>
+    </el-form-item>    
   </el-form>
   <div slot="footer" class="dialog-footer">
     <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -32,16 +34,17 @@
 
 <script>
 let id = 1000;
-const cityOptions = ['上海', '北京', '广州', '深圳'];
+
   export default {
     data() {
       return {
-        cities: cityOptions,
-        formLabelWidth:80,
+        formLabelWidth:'80',
         optype:'',
         form:{
             id:'',
-            label:''
+            title:'',
+            tag:'',
+            idx:''
         },
          dialogFormVisible: false,
         obj_parent:{},
@@ -61,13 +64,12 @@ const cityOptions = ['上海', '北京', '广州', '深圳'];
  created: function () {
         this.getTree();
     }  ,  
-    methods: {
+methods: {
     getTree(){
         let _this=this
-        var params_json={userId:'15122922900',action:'getdepartment',param1:"",param2:"",param3:"",param4:'',param5:''};
-
+        var params_json={userId:'15122922900',action:'getdepartmentAdmin',param1:"",param2:"",param3:"",param4:'',param5:''};
          this.$http.post('/KindergartenWeb/action/tree.do',params_json,{withCredentials:true}).then(function (res) {
-           //alert(JSON.stringify(res.data.rows));
+           //alert(JSON.stringify(res.data.rows)); [id,title,tag,children[]]
            _this.data2=res.data.rows;
         }).catch(function (error) {
               alert('操作异常ooo')
@@ -75,35 +77,55 @@ const cityOptions = ['上海', '北京', '广州', '深圳'];
     },
      onFormSave(){
        this.dialogFormVisible=false;
+       let _this=this
        if(this.optype=="insert"){
-        this.obj_parent.splice(this.obj_index,0,{id: this.form.id, label:this.form.label , children: [] });
+                //this.obj_parent.splice(this.obj_index,0,{id: this.form.id,title:this.form.title , children: [] });
+              var params_json={depId:this.form.id,depTitle:this.form.title,tag:this.form.tag,depIdx:''};
+              this.$http.post('/KindergartenWeb/action/dep/add.do',params_json,{withCredentials:true}).then(function (res) {
+
+                if(res.data==1){
+                      _this.$message({
+                        message: '添加成功！',
+                        type: 'success'
+                    });
+                        _this.getTree();  
+                }    
+            }).catch(function (error) {
+                _this.$message.error(error);
+            })             
        }else if(this.optype=="update"){
-         this.obj_current.id=this.form.id;
-         this.obj_current.label=this.form.label;
+              var params_json={depId:this.form.id,depTitle:this.form.title,tag:this.form.tag,depIdx:this.form.idx};
+              this.$http.post('/KindergartenWeb/action/dep/update.do',params_json,{withCredentials:true}).then(function (res) {
+  
+                if(res.data==1){
+                      _this.$message({
+                        message: '修改成功！',
+                        type: 'success'
+                    });
+                        _this.getTree();  
+                }    
+            }).catch(function (error) {
+                _this.$message.error(error);
+            })  
        }
         this.form.id='';
-        this.form.label='';
+        this.form.title='';
+        this.form.tag='';
+        this.form.idx='';
      } ,     
-    getArray(data,name)
+    getArray(data,id)
     {
         for (var i in data) {
-            console.log('i',i);
-            console.log('datai',data[i].children);
-            //alert(data[i].label);
-            if (data[i].label == name) {
-                alert(data[i].label);
+            if (data[i].id == id) {
                 this.obj_index=i;
                 this.obj_parent=data;
                 return;
             } else {
-                this.getArray(data[i].children, name);
+                this.getArray(data[i].children, id);
             }
         }
     },
       onClick(data,node,self){
-        // alert(data.label);
-         
-         // alert((node));
          // alert(JSON.stringify(self));
          //this.data2.splice(1,1,{id:id++,label:'00',children: []});
       },
@@ -111,23 +133,55 @@ const cityOptions = ['上海', '北京', '广州', '深圳'];
         this.optype='update';
         this.obj_current=data;
         this.form.id=data.id;
-        this.form.label=data.label;
+        this.form.idx=data.id;
+        this.form.title=data.title.replace('['+data.id+']','');
+        this.form.tag=data.tag;
         this.dialogFormVisible=true;
       },      
       append(store, data) {
-        store.append({ id: id++, label: 'testtest', children: [] }, data);
+        //store.append({ id: id++, label: 'testtest', children: [] }, data);
+       this.optype='insert';
+       this.form.id=data.id;
+        this.form.title="";
+        this.form.tag="";
+       this.dialogFormVisible = true;
       },
      insert(store, data) {
        this.optype='insert';
+       this.form.id=data.id.substring(0,data.id.length-2);
+        this.form.title="";
+        this.form.tag="";
+
+        this.getArray(this.data2,data.id);
        this.dialogFormVisible = true;
-       this.getArray(this.data2,data.label);
-        //alert(this.obj_parent.length+"\n"+this.obj_index);
-        //this.obj_parent.splice(this.obj_index,0,{id: id++, label: 'testtest', children: [] });
       },
       remove(store, data) {
-        store.remove(data);
-      },
+        //alert(JSON.stringify(data))
+        //store.remove(data);
+             let _this=this
+              var params_json={key:data.id};
 
+      this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
+                  _this.$http.post('/KindergartenWeb/action/dep/delete.do',params_json,{withCredentials:true}).then(function (res) {
+                      if(res.data==1){
+                            _this.$message({
+                              message: '删除成功！',
+                              type: 'success'
+                          });
+                              _this.getTree();  
+                      }    
+                  }).catch(function (error) {
+                      _this.$message.error(error);
+                  })  
+            }).catch(() => {
+                
+            }); 
+       
+      },
       renderContent(h, { node, data, store }) {
         return (<span>
                     <span>

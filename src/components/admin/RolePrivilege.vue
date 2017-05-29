@@ -18,18 +18,19 @@
             </el-table-column>
           </el-table>
      </div>
-    <div style="float:left;margin-left:20px;">
+    <div style="float:left;margin-left:20px;" >
           <el-table
           :data="privilegeList"
+          v-loading.body="loading"
           border
           tooltip-effect="dark">
-
           <el-table-column
             prop="resourceId"
             label="#"
             width="80">
           </el-table-column>
           <el-table-column
+           ref='coltitle'
             prop="resourceTitle"
             label="title"
             width="150">
@@ -69,52 +70,20 @@
             <template scope="scope">
               <el-checkbox v-model="scope.row.co"></el-checkbox>
             </template>
-          </el-table-column>  
-            <el-table-column
-      type="selection"
-      width="55">##
-            </el-table-column>              
+          </el-table-column>             
         </el-table>  
     </div>
     <div style="clear:both;">
          <el-button type="primary" @click="onSave">保存</el-button> 
-         <el-checkbox v-model="csall" >select</el-checkbox>
     </div> 
   </div>
 </template>
 
 <script>
  export default {
-    watch: {
-        csall: function (val, oldVal) {
-          console.log('new: %s, old: %s', val, oldVal)
-          for (let i = 0; i < this.privilegeList.length; i++) {
-                 this.privilegeList[i].cs=val;
-            }
-        },
-      ciall: function (val, oldVal) {
-            for (let i = 0; i < this.privilegeList.length; i++) {
-                 this.privilegeList[i].ci=val;
-            }
-        },
-      cuall: function (val, oldVal) {
-            for (let i = 0; i < this.privilegeList.length; i++) {
-                 this.privilegeList[i].cu=val;
-            }
-        },
-      cdall: function (val, oldVal) {
-             for (let i = 0; i < this.privilegeList.length; i++) {
-                 this.privilegeList[i].cd=val;
-            }
-        },
-      coall: function (val, oldVal) {
-            for (let i = 0; i < this.privilegeList.length; i++) {
-                 this.privilegeList[i].co=val;
-            }
-        }                    
-    },
     data() {
       return {
+        loading:false,
         roleList:[],
         csall:false,
         ciall:false,
@@ -144,7 +113,36 @@
     },
     created: function () {
            this.getData();
-    }  ,    
+    }, 
+    watch: {
+        csall: function (val, oldVal) {
+          console.log('new: %s, old: %s', val, oldVal)
+          for (let i = 0; i < this.privilegeList.length; i++) {
+                 this.privilegeList[i].cs=val;
+            }
+            return true
+        },
+      ciall: function (val, oldVal) {
+            for (let i = 0; i < this.privilegeList.length; i++) {
+                 this.privilegeList[i].ci=val;
+            }
+        },
+      cuall: function (val, oldVal) {
+            for (let i = 0; i < this.privilegeList.length; i++) {
+                 this.privilegeList[i].cu=val;
+            }
+        },
+      cdall: function (val, oldVal) {
+             for (let i = 0; i < this.privilegeList.length; i++) {
+                 this.privilegeList[i].cd=val;
+            }
+        },
+      coall: function (val, oldVal) {
+            for (let i = 0; i < this.privilegeList.length; i++) {
+                 this.privilegeList[i].co=val;
+            }
+        }                    
+    },       
     methods: {
       onSave(){
           let _this=this
@@ -154,7 +152,7 @@
           
           if(JSON.stringify(res.data)=='1'){
                 _this.$message({
-                  showClose: true,
+                  //showClose: true,
                   message: '保存成功！',
                   type: 'success'
               });
@@ -169,7 +167,7 @@
             _this.$message.error(error);
         })     
       },
-       getPrivilege(roleid){
+    getPrivilege(roleid){
           var j=0;
          var data = [];
          let _this=this;
@@ -221,43 +219,30 @@
            
         }).catch(function (error) {
                alert(error);
-        }) 
+        })
+        this.loading=false 
  },      
      renderHeader(h, { column, $index }){
        var self = this
 
-     if($index==22){
-             return (<span> <el-checkbox  >other</el-checkbox></span>);                                       
-     }   
-     else if($index==2){
-          return  h('el-checkbox', {
+       if($index==2){
+          return h('el-checkbox',{
                       domProps: {
                         label:'查询',
-                        checked:this.csall,
-                        value: self.value,
-                        id:'idcsall'
-                      },
-                      props: ["csall"],
-                       watch: {
-                       [self.csall]: function (val, oldVal) {
-                        alert("get it");
-                        console.log('new: %s, old: %s', val, oldVal)
-                      }
-                       },
+                        value:this.csall,
+                      }, 
                       on: {
                         change: function (e) {
                           self.csall= e.target.checked
-                        }
+                        }                       
                       }
-                    }
-                )
+                })
          }
          else if($index==3){
               return  h('el-checkbox', {
                             domProps: {
                               label:'新建',
-                              checked:this.ciall,
-                              value: self.value
+                              value:this.ciall
                             },
                             on: {
                               change: function (e) {
@@ -271,8 +256,7 @@
               return  h('el-checkbox', {
                               domProps: {
                                 label:'修改',
-                                checked:this.cuall,
-                                value: self.value
+                                value:this.cuall
                               },
                               on: {
                                 change: function (e) {
@@ -286,9 +270,8 @@
               return  h('el-checkbox', {
                               domProps: {
                                 label:'删除',
-                                checked:this.cdall,
-                                value: self.value
-                              },
+                                value:this.cdall
+                                 },
                               on: {
                                 change: function (e) {
                                   self.cdall= e.target.checked
@@ -301,9 +284,8 @@
                 return  h('el-checkbox', {
                                 domProps: {
                                   label:'其它',
-                                  checked:this.coall,
-                                  value: self.value
-                                },
+                                  value:this.coall 
+                                   },
                                 on: {
                                   change: function (e) {
                                     self.coall= e.target.checked
@@ -315,13 +297,16 @@
             // return (<span> <el-checkbox v-model="coall" on-change={()=> this.onChange( column, $index)}>other</el-checkbox></span>);                                       
      },
        handleCurrentChange(val) {
+         // console.log(csobj)
+
         this.csall=false
         this.ciall=false
         this.cuall=false
         this.cdall=false
         this.coall=false
-        //document.getElementById("idcsall").checked=false;
 
+        this.loading=true
+        
         this.getPrivilege(val.id);
       } ,     
         getData(){

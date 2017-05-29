@@ -20,6 +20,9 @@ import Role from './components/admin/Role'
 import RoleUser from './components/admin/RoleUser'
 import RolePrivilege from './components/admin/RolePrivilege'
 
+import TableTest from './components/business/TableTest'
+
+
 axios.defaults.withCredentials=true;
 Vue.prototype.$http = axios
 
@@ -36,6 +39,7 @@ Vue.config.productionTip = false
 const routes = [
  
   { path: '/', name: 'login', component: Login },
+    { path: '/tabletest', name: 'tabletest', component: TableTest } ,
    {
     path: '/main',
     component: Main,
@@ -43,6 +47,7 @@ const routes = [
       { path: '/hello', name: 'Hello', component: Hello } ,
       { path: '/table', name: 'table', component: Table } ,
        { path: '/test', name: 'test', component: Test } ,
+      
        { path: '/teacher', name: 'teacher', component: Teacher } ,
         { path: '/user', name: 'user', component: User },
          { path: '/department', name: 'department', component: Department } ,
