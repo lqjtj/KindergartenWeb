@@ -34,8 +34,9 @@
             params.append('userId', '15122922900');
             params.append('action', 'getmenu');
 
+           var client=window.localStorage.getItem("client"); 
         var params_json={
-                         userId:'15122922900',
+                         userId:client,
                          action:'getMenu',
                          param1:'',
                          param2:'',
