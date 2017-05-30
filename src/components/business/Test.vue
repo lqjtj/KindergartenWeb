@@ -75,6 +75,52 @@
   </div>
 </el-dialog>     
 
+<el-upload
+  class="avatar-uploader"
+  action="/KindergartenWeb/file/upload2.do"
+  :show-file-list="false"
+  :data="formupload"
+  :on-success="handleAvatarSuccess"
+  :on-error="handleAvatarFailure"
+  :before-upload="beforeAvatarUpload">
+  <img v-if="imageUrl" :src="imageUrl" class="avatar">
+  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+</el-upload>
+
+<hr/>
+<el-upload
+  class="upload-demo"
+  ref="upload"
+  multiple
+  with-credentials
+  action="/KindergartenWeb/file/upload2.do"
+  :data="formupload"
+  :on-preview="handlePreview"
+  :on-remove="handleRemove"
+  :on-success="handleAvatarSuccess"
+  :on-error="handleAvatarFailure"
+  :file-list="fileList"
+  :auto-upload="false">
+  <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+  <el-button  size="small" type="success" @click="submitUpload">上传到服务器</el-button>
+  <el-button  size="small" type="info" @click="uploaded">查看已上传内容</el-button>
+
+  <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+</el-upload>
+
+<el-dialog title="已上传内容" v-model="dialogTableVisible">
+  <el-table :data="dataUploaded" height=300 highlight-current-row @current-change="handleCurrentChange"  v-loading.body="loading">
+    <el-table-column property="id" label="#" width="50"></el-table-column>
+    <el-table-column property="name" label="姓名" width="100"></el-table-column>
+    <el-table-column property="fname" label="文件名"></el-table-column>
+    <el-table-column property="inserttime" label="上传时间"></el-table-column>
+  </el-table>
+    <div slot="footer" class="dialog-footer">
+    <el-button @click="dialogTableVisible = false">取 消</el-button>
+    <el-button type="primary" @click="dialogTableClose">确 定</el-button>
+  </div>
+</el-dialog>
+
 </div>
 </template>
 
@@ -83,7 +129,16 @@
   export default {
     data() {
       return {
+        imageUrl: '',
+         bloading:false,
+         formupload:{},
+         fileList: [],
+
           dialogFormVisible: false,
+          dialogTableVisible:false,
+          dataUploaded:[],
+          currentRow: {},
+
    form: {
           name: '',
           region: '',
@@ -95,7 +150,6 @@
           desc: ''
         },
          formLabelWidth: '120px',
-
 
           value1: '',
           pickerOptions0: {
@@ -147,7 +201,42 @@
        //  alert(this.checkedCities1);
     }  ,    
    methods: {
- open2() {
+      dialogTableClose(){
+         this.dialogTableVisible = false
+         alert(this.currentRow.fname+":"+this.currentRow.fpath)
+      },
+      handleCurrentChange(val) {
+        this.currentRow = val;
+        
+      },     
+     uploaded(){
+       this.loading=true
+       var j=0;
+         var data = [];
+         let _this=this;
+       var params_json={userId:'15122922900',action:'uploaded',param1:'',param2:'',param3:'',param4:'',param5:''};
+       this.$http.post('/KindergartenWeb/action/list.do',params_json).then(function (res) {
+   
+            _this.dataUploaded = res.data.rows
+             _this.loading=false;
+        }).catch(function (error) {
+               alert(error);
+        })        
+         this.dialogTableVisible=true
+     },
+        submitUpload() {
+        this.formupload.client="15122922900";
+        this.formupload.name="liu";
+         this.formupload.pwd="123hhh"; 
+        this.$refs.upload.submit();
+      },
+      handleRemove(file, fileList) {
+        console.log(file, fileList);
+      },
+      handlePreview(file) {
+        console.log(file);
+      },
+      open2() {
         this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -201,15 +290,71 @@
       handleSelect(item) {
         alert(item.value+"\n"+item.address);
         console.log(item);
-      }
+      },
+      handleAvatarFailure(err, file){
+           alert(err);
+      } ,     
+      handleAvatarSuccess(res, file) {
+        this.imageUrl = URL.createObjectURL(file.raw);
+        alert(JSON.stringify(res));
+      },
+      beforeAvatarUpload(file) {
+        const isJPG = file.type === 'image/jpeg';
+        const isLt2M = file.size / 1024 / 1024 < 2;
+
+          //  var params = new URLSearchParams();
+          //   params.append('client', '15122922900');
+          //   params.append('name', 'liu');
+          //   params.append('pwd', 'query_rk_pc');
+ 
+       this.formupload.client="15122922900";
+        this.formupload.name="liu";
+         this.formupload.pwd="123hhh";
+
+        if (!isJPG) {
+          this.$message.error('上传头像图片只能是 JPG 格式!');
+        }
+        if (!isLt2M) {
+          this.$message.error('上传头像图片大小不能超过 2MB!');
+        }
+        return isJPG && isLt2M;
+      }        
     },
     mounted() {
       this.restaurants = this.loadAll();
-    }                              
+    }
+                                
   }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+.avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #20a0ff;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  } 
+    .upload-demo {
+    width: 300px;
+    height: 178px;
+    display: block;
+  } 
 </style>

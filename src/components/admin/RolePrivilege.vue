@@ -92,22 +92,13 @@
         coall:false,
         privilegeList: [{
           roleId:'',
-          resourceId: '2016-05-03',
-          resourceTitle: '王小虎',
-          cs:true,
+          resourceId: '',
+          resourceTitle: '',
+          cs:false,
           ci:false,
           cu:false,
-          cd:true,
-          co:true
-        }, {
-          roleId:'',
-          resourceId: '2016-05-03',
-          resourceTitle: '王小虎',
-          cs:true,
-          ci:false,
-          cu:false,
-          cd:true,
-          co:true
+          cd:false,
+          co:false
         }]
       }
     },
