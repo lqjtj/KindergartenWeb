@@ -569,9 +569,7 @@ function getuuid(){
        this.onPost();
 
         var menu=JSON.parse(window.localStorage.getItem("menu"));
-       // alert(window.localStorage.getItem("menu"))
-       console.log(menu)
-
+       // console.log(menu)
         for(var index=0;index<menu.length;index++){
             if(menu[index].url=='/user'){
                this.padd=menu[index].padd
@@ -580,7 +578,7 @@ function getuuid(){
                this.pother=menu[index].pother
             }
         }
-        alert(this.padd)
+      
        
     }    
   }
