@@ -54,27 +54,27 @@
                 obj.title = res.data.rows[i].title
                 obj.code = res.data.rows[i].code
                 obj.url = res.data.rows[i].url
-                if(res.data.rows[i].pselect=='0')
+                if(res.data.rows[i].pselect=='1')
                   obj.pselect=true
                 else
                   obj.pselect=false
 
-                if(res.data.rows[i].padd=='0')
+                if(res.data.rows[i].padd=='1')
                   obj.padd=true
                 else
                   obj.padd=false 
 
-                 if(res.data.rows[i].pupdate=='0')
+                 if(res.data.rows[i].pupdate=='1')
                   obj.pupdate=true
                 else
                   obj.pupdate=false
 
-                if(res.data.rows[i].pdelete=='0')
+                if(res.data.rows[i].pdelete=='1')
                   obj.pdelete=true
                 else
                   obj.pdelete=false
 
-                if(res.data.rows[i].pother=='0')
+                if(res.data.rows[i].pother=='1')
                   obj.pother=true
                 else
                   obj.pother=false                                                                     

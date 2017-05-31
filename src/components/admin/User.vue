@@ -77,7 +77,7 @@
 
      <!--<el-button type="primary" @click="onNew">新建</el-button>-->
 
-     <el-button type="primary" @click="dialogCreateVisible = true" :disabled="padd">添加用户</el-button>
+     <el-button type="primary" @click="dialogCreateVisible = true"   v-show="padd" >添加用户</el-button>
 
      <!-- <el-button type="primary" @click="open3">测试摁钮</el-button>
      <el-button type="primary" @click="dialogFormVisible = true">测试嵌套表单</el-button>
@@ -101,8 +101,8 @@
 
      <!--<el-button type="primary" @click="onUpdate">修改</el-button>-->
      <!--<el-button type="primary" @click="dialogUpdateVisible = true">修改</el-button>-->
-     <el-button type="primary" @click="setCurrent()" :disabled="pupdate">修改</el-button>
-      <el-button type="primary" @click="onDelete" :disabled="pdelete">删除</el-button>
+     <el-button type="primary" @click="setCurrent()"  v-show="pupdate">修改</el-button>
+      <el-button type="primary" @click="onDelete"  v-show="pdelete">删除</el-button>
 
 
   <el-dialog title="创建用户" v-model="dialogCreateVisible" :close-on-click-modal="false" :close-on-press-escape="false"  >
@@ -570,7 +570,7 @@ function getuuid(){
 
         var menu=JSON.parse(window.localStorage.getItem("menu"));
        // alert(window.localStorage.getItem("menu"))
-      // console.log(menu)
+       console.log(menu)
 
         for(var index=0;index<menu.length;index++){
             if(menu[index].url=='/user'){
@@ -580,6 +580,7 @@ function getuuid(){
                this.pother=menu[index].pother
             }
         }
+        alert(this.padd)
        
     }    
   }
