@@ -77,7 +77,7 @@
 
      <!--<el-button type="primary" @click="onNew">新建</el-button>-->
 
-     <el-button type="primary" @click="dialogCreateVisible = true">添加用户</el-button>
+     <el-button type="primary" @click="dialogCreateVisible = true" :disabled="padd">添加用户</el-button>
 
      <!-- <el-button type="primary" @click="open3">测试摁钮</el-button>
      <el-button type="primary" @click="dialogFormVisible = true">测试嵌套表单</el-button>
@@ -101,17 +101,9 @@
 
      <!--<el-button type="primary" @click="onUpdate">修改</el-button>-->
      <!--<el-button type="primary" @click="dialogUpdateVisible = true">修改</el-button>-->
-     <el-button type="primary" @click="setCurrent()">修改</el-button>
-      <el-button type="primary" @click="onDelete">删除</el-button>
-<el-upload
-  class="avatar-uploader"
-  action="/api/file/upload2.do"
-  :show-file-list="false"
-  :on-success="handleAvatarSuccess"
-  :before-upload="beforeAvatarUpload">
-  <img v-if="imageUrl" :src="imageUrl" class="avatar">
-  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-</el-upload>
+     <el-button type="primary" @click="setCurrent()" :disabled="pupdate">修改</el-button>
+      <el-button type="primary" @click="onDelete" :disabled="pdelete">删除</el-button>
+
 
   <el-dialog title="创建用户" v-model="dialogCreateVisible" :close-on-click-modal="false" :close-on-press-escape="false"  >
         <el-form id="#create" :model="create" :rules="rules" ref="create" label-width="100px">
@@ -200,7 +192,10 @@ function getuuid(){
       };
 
       return {
-
+          padd:false,
+          pupdate:false,
+          pdelete:false,
+          pother:false,
         // url: 'url',
           users: [
           ],
@@ -571,7 +566,21 @@ function getuuid(){
       },                      
     },
  created: function () {
-        this.onPost();
+       this.onPost();
+
+        var menu=JSON.parse(window.localStorage.getItem("menu"));
+       // alert(window.localStorage.getItem("menu"))
+      // console.log(menu)
+
+        for(var index=0;index<menu.length;index++){
+            if(menu[index].url=='/user'){
+               this.padd=menu[index].padd
+               this.pupdate=menu[index].pupdate
+               this.pdelete=menu[index].pdelete
+               this.pother=menu[index].pother
+            }
+        }
+       
     }    
   }
 </script>

@@ -48,12 +48,37 @@
              var data_sub = [];
              var j=0,k=0;
          this.$http.post('/KindergartenWeb/action/list.do',params_json).then(function (res) {
-           //alert(JSON.stringify(res.data));
+          // alert(JSON.stringify(res.data));
            for (let i = 0; i < res.data.rows.length; i++) {
                 var obj = {}
                 obj.title = res.data.rows[i].title
                 obj.code = res.data.rows[i].code
                 obj.url = res.data.rows[i].url
+                if(res.data.rows[i].pselect=='0')
+                  obj.pselect=true
+                else
+                  obj.pselect=false
+
+                if(res.data.rows[i].padd=='0')
+                  obj.padd=true
+                else
+                  obj.padd=false 
+
+                 if(res.data.rows[i].pupdate=='0')
+                  obj.pupdate=true
+                else
+                  obj.pupdate=false
+
+                if(res.data.rows[i].pdelete=='0')
+                  obj.pdelete=true
+                else
+                  obj.pdelete=false
+
+                if(res.data.rows[i].pother=='0')
+                  obj.pother=true
+                else
+                  obj.pother=false                                                                     
+
                 if(obj.code.length==2)
                   data[j++] = obj
                 else
@@ -62,6 +87,7 @@
            
             _this.items = data
             _this.items_sub = data_sub
+            window.localStorage.setItem("menu",JSON.stringify(data_sub));
            
         }).catch(function (error) {
                alert(error);

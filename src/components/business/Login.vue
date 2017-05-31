@@ -39,7 +39,7 @@
                 obj.name = res.data.rows[i].name
             }
             alert(JSON.stringify(obj));
-                    window.localStorage.setItem("name",obj.name);
+                     window.localStorage.setItem("name",obj.name);
                      window.localStorage.setItem("client",obj.client);
             //window.localStorage.setItem("pwd",this.pwd);
               _this.$router.push("/main");
