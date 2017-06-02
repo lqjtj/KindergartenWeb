@@ -20,32 +20,23 @@
      </div>
 
        <div style="float:left;margin-left:20px;" >
-            <el-table
-                :data="roleUsers"
-                border
-                tooltip-effect="dark"
-                style="width: 100%">
-                <el-table-column
-                  label=""
-                  width="55">
-                     <template scope="scope">
-                            <el-checkbox v-model="scope.row.valid"></el-checkbox>
-                    </template>
-                </el-table-column>
-                <el-table-column
-                  label="#"
-                  prop="hkey"
-                  width="120">
-                </el-table-column>
-                <el-table-column
-                  prop="name"
-                  label="姓名"
-                  width="120">
-                </el-table-column>
-              </el-table>
+              <el-tree
+            :data="department"
+            :props="defaultProps"
+            highlight-current
+            show-checkbox
+            default-expand-all
+            node-key="id"
+            ref="tree"
+            :expand-on-click-node="false"
+            >
+          </el-tree>
        </div>
          <div style="clear:both;">
          <el-button type="primary" @click="onSave">保存</el-button> 
+  <el-button @click="getCheckedKeys">通过 key 获取</el-button>
+  <el-button @click="setCheckedKeys">通过 key 设置</el-button>
+  <el-button @click="resetChecked">清空</el-button>         
     </div> 
   </div>
 </template>
@@ -57,14 +48,41 @@
        loading:false,
         roleList:[],
         roleUsers:[] ,
-        roleId:''        
+        roleId:'' ,
+
+        department:[],
+        role_department:[],
+        defaultProps: {
+          children: 'children',
+          label: 'title'
+        }           
       }
     },
    created: function () {
            this.getRole();
+           this.getDepartment();
     },     
-    methods: {      
-       getRole(){
+    methods: {
+      getCheckedKeys() {
+        console.log(this.$refs.tree.getCheckedKeys());
+      },
+      setCheckedKeys() {
+        this.$refs.tree.setCheckedKeys(['0020']);
+      },
+      resetChecked() {
+        this.$refs.tree.setCheckedKeys([]);
+      },      
+    getDepartment(){
+          let _this=this
+          var params_json={userId:'15122922900',action:'getdepartmentAdmin',param1:"",param2:"",param3:"",param4:'',param5:''};
+          this.$http.post('/KindergartenWeb/action/tree.do',params_json,{withCredentials:true}).then(function (res) {
+            //alert(JSON.stringify(res.data.rows)); [id,title,tag,children[]]
+            _this.department=res.data.rows;
+          }).catch(function (error) {
+                alert('操作异常ooo')
+          })     
+      },            
+     getRole(){
         var j=0;
          var data = [];
          let _this=this;
@@ -82,27 +100,19 @@
                alert(error);
         }) 
         },
-     getRoleUsers(roleid){
+     getRoleDepartments(roleid){
           var j=0;
          var data = [];
          let _this=this;
 
-       var params_json={userId:'15122922900',action:'roleUserslist',param1:roleid,param2:'',param3:'',param4:'', param5:''};
+       var params_json={userId:'15122922900',action:'roleDepartmentlist',param1:roleid,param2:'',param3:'',param4:'', param5:''};
        this.$http.post('/KindergartenWeb/action/list.do',params_json).then(function (res) {
            //alert(JSON.stringify(res.data));
            for (let i = 0; i < res.data.rows.length; i++) {
-                var obj = {}
-                obj.hkey=res.data.rows[i].hkey
-                obj.name = res.data.rows[i].name
-                obj.roleId=_this.roleId
-                if(res.data.rows[i].valid=='0')
-                    obj.valid=false
-                else
-                    obj.valid=true
- 
-                  data[j++] = obj
+                  data[j++] = res.data.rows[i].depid
             }
-            _this.roleUsers = data
+            _this.role_department = data
+            _this.$refs.tree.setCheckedKeys(_this.role_department);
            
         }).catch(function (error) {
                alert(error);
@@ -111,26 +121,13 @@
  },          
       onSave(){
           let _this=this
-          var userx=[]
-          var j=0
-          for(var i =0;i<this.roleUsers.length;i++){
-　                if(this.roleUsers[i].valid){
-                      userx[j++]=this.roleUsers[i];
-                  }
-             }
-           //角色成员都清空时需要补充一条数据,用于后端清空操作  hkey=-1
-            if(userx.length==0){
-              var obj = {}
-              obj.hkey='-1'
-              obj.name=''
-              obj.valid=false
-              obj.roleId=this.roleId
-              userx[0]=obj
-            }
-             
-          var params_json=userx
-           //alert(JSON.stringify(params_json));
-            this.$http.post('/KindergartenWeb/action/role/users.do',params_json,{withCredentials:true}).then(function (res) {
+      
+      var departments= this.$refs.tree.getCheckedKeys().join(',')
+           var params = new URLSearchParams();
+            params.append('roleId', this.roleId);
+            params.append('departments', departments);
+
+            this.$http.post('/KindergartenWeb/action/role/departments.do',params).then(function (res) {
           
           if(JSON.stringify(res.data)=='1'){
                 _this.$message({
@@ -152,7 +149,7 @@
        handleCurrentChange(val) {
         this.loading=true
         this.roleId=val.id
-        this.getRoleUsers(val.id)
+        this.getRoleDepartments(val.id)
       }      
     }
   }
